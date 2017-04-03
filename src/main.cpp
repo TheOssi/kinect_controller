@@ -2,6 +2,7 @@
 #include "std_msgs/String.h"
 #include <tf2_msgs/TFMessage.h>
 #include <string>
+#include <fl/fuzzylite.h>
 
 using namespace std;
 

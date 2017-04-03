@@ -14,7 +14,15 @@ find_package(catkin REQUIRED COMPONENTS
   genmsg
   tf2_msgs
 )
+add_executable(kinect_controller src/main.cpp)
+#set(FL_PATH ../fuzzylite/release/bin/)
+find_library(FL libfuzzylite.so ../fuzzylite/release/bin/)
+ target_link_libraries(${PROJECT_NAME}
+   ${catkin_LIBRARIES}
+   ${FL}
+ )
 
+#target_link_libraries(kinect_controller ${catkin_LIBRARIES} ${fuzzylite})
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
