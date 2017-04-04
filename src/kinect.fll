@@ -1,0 +1,127 @@
+Engine: input
+InputVariable: backward
+  enabled: true
+  range: -1.000 1.000
+  lock-range: false
+  term: strongForward Trapezoid -2.000 -2.000 -0.800 -0.400
+  term: mediumForward Trapezoid -0.900 -0.600 -0.400 0.000
+  term: mediumBackward Trapezoid 0.000 0.400 0.600 0.900
+  term: strongBackward Trapezoid 0.400 0.800 2.000 2.000
+  term: zero Trapezoid -0.600 -0.200 0.200 0.600
+InputVariable: sideward
+  enabled: true
+  range: -1.000 1.000
+  lock-range: false
+  term: strongLeft Trapezoid -2.000 -2.000 -0.800 -0.400
+  term: mediumLeft Trapezoid -0.900 -0.600 -0.400 0.000
+  term: mediumRight Trapezoid 0.000 0.400 0.600 0.900
+  term: strongRight Trapezoid 0.400 0.800 2.000 2.000
+  term: zero Trapezoid -0.600 -0.200 0.200 0.600
+InputVariable: up
+  enabled: true
+  range: -1.000 1.000
+  lock-range: false
+  term: strongDown Trapezoid -2.000 -2.000 -0.800 -0.400
+  term: mediumDown Trapezoid -0.900 -0.600 -0.400 0.000
+  term: mediumUp Trapezoid 0.000 0.400 0.600 0.900
+  term: strongUp Trapezoid 0.400 0.800 2.000 2.000
+  term: zero Trapezoid -0.600 -0.200 0.200 0.600
+InputVariable: rotation
+  enabled: true
+  range: -1.000 1.000
+  lock-range: false
+  term: strongLeft Trapezoid -2.000 -2.000 -0.800 -0.400
+  term: mediumLeft Trapezoid -0.900 -0.600 -0.400 0.000
+  term: mediumRight Trapezoid 0.000 0.400 0.600 0.900
+  term: strongRight Trapezoid 0.400 0.800 2.000 2.000
+  term: zero Trapezoid -0.600 -0.200 0.200 0.600
+OutputVariable: backwardSpeed
+  enabled: true
+  range: -1.000 1.000
+  lock-range: false
+  aggregation: UnboundedSum
+  defuzzifier: Centroid 100
+  default: nan
+  lock-previous: false
+  term: strongForward Triangle -1.200 -1.000 -0.700
+  term: mediumForward Trapezoid -1.000 -0.850 -0.600 -0.250
+  term: mediumBackward Trapezoid 0.250 0.600 0.850 1.000
+  term: strongBackward Triangle 0.700 1.000 2.200
+  term: zero Trapezoid -0.800 -0.500 0.500 0.800
+OutputVariable: sidewardSpeed
+  enabled: true
+  range: -1.000 1.000
+  lock-range: false
+  aggregation: UnboundedSum
+  defuzzifier: Centroid 100
+  default: nan
+  lock-previous: false
+  term: strongLeft Triangle -1.200 -1.000 -0.700
+  term: mediumLeft Trapezoid -1.000 -0.850 -0.600 -0.250
+  term: mediumRight Trapezoid 0.250 0.600 0.850 1.000
+  term: strongRight Triangle 0.700 1.000 2.200
+  term: zero Trapezoid -0.800 -0.500 0.500 0.800
+OutputVariable: upSpeed
+  enabled: true
+  range: -1.000 1.000
+  lock-range: false
+  aggregation: UnboundedSum
+  defuzzifier: Centroid 100
+  default: nan
+  lock-previous: false
+  term: strongDown Triangle -1.200 -1.000 -0.700
+  term: mediumDown Trapezoid -1.000 -0.850 -0.600 -0.250
+  term: mediumUp Trapezoid 0.250 0.600 0.850 1.000
+  term: strongUp Triangle 0.700 1.000 2.200
+  term: zero Trapezoid -0.800 -0.500 0.500 0.800
+OutputVariable: rotationSpeed
+  enabled: true
+  range: -1.000 1.000
+  lock-range: false
+  aggregation: UnboundedSum
+  defuzzifier: Centroid 100
+  default: nan
+  lock-previous: false
+  term: strongLeft Triangle -1.200 -1.000 -0.700
+  term: mediumLeft Trapezoid -1.000 -0.850 -0.600 -0.250
+  term: mediumRight Trapezoid 0.250 0.600 0.850 1.000
+  term: strongRight Triangle 0.700 1.000 2.200
+  term: zero Trapezoid -0.800 -0.500 0.500 0.800
+RuleBlock: 
+  enabled: true
+  conjunction: Minimum
+  disjunction: Maximum
+  implication: Minimum
+  activation: General
+  rule: if backward is strongForward then backwardSpeed is strongForward
+  rule: if backward is mediumForward then backwardSpeed is mediumForward
+  rule: if backward is mediumBackward then backwardSpeed is strongBackward
+  rule: if backward is strongBackward then backwardSpeed is strongBackward
+  rule: if backward is zero then backwardSpeed is zero
+  rule: if sideward is strongLeft then sidewardSpeed is strongLeft
+  rule: if sideward is mediumLeft then sidewardSpeed is mediumLeft
+  rule: if sideward is mediumRight then sidewardSpeed is mediumRight
+  rule: if sideward is strongRight then sidewardSpeed is strongRight
+  rule: if sideward is zero then sidewardSpeed is zero
+  rule: if backward is mediumBackward then backwardSpeed is strongBackward
+  rule: if up is strongDown then upSpeed is strongDown
+  rule: if up is mediumDown then upSpeed is mediumDown
+  rule: if up is mediumUp then upSpeed is mediumUp
+  rule: if up is strongUp then upSpeed is strongUp
+  rule: if up is zero then upSpeed is zero
+  rule: if rotation is strongLeft then rotationSpeed is strongLeft
+  rule: if rotation is mediumLeft then rotationSpeed is mediumLeft
+  rule: if rotation is mediumRight then rotationSpeed is mediumRight
+  rule: if rotation is strongRight then rotationSpeed is strongRight
+  rule: if rotation is zero then rotationSpeed is zero
+  rule: if backward is strongForward and sideward is strongLeft then backwardSpeed is strongForward and sidewardSpeed is strongLeft and rotationSpeed is strongLeft
+  rule: if backward is mediumForward and sideward is mediumLeft then backwardSpeed is mediumForward and sidewardSpeed is mediumLeft and rotationSpeed is mediumLeft
+  rule: if backward is strongForward and sideward is strongRight then backwardSpeed is strongForward and sidewardSpeed is strongRight and rotationSpeed is strongRight
+  rule: if backward is mediumForward and sideward is mediumRight then backwardSpeed is mediumForward and sidewardSpeed is mediumRight and rotationSpeed is mediumRight
+  rule: if backward is mediumForward and sideward is strongRight then backwardSpeed is mediumForward and sidewardSpeed is strongRight and rotationSpeed is strongRight
+  rule: if backward is mediumForward and sideward is strongLeft then backwardSpeed is mediumForward and sidewardSpeed is strongLeft and rotationSpeed is strongLeft
+  rule: if backward is mediumForward and sideward is zero then backwardSpeed is mediumForward and sidewardSpeed is zero and rotationSpeed is zero
+  rule: if backward is strongForward and sideward is zero then backwardSpeed is strongForward and sidewardSpeed is zero and rotationSpeed is zero
+  rule: if backward is strongForward and sideward is mediumLeft then backwardSpeed is strongForward and sidewardSpeed is mediumLeft and rotationSpeed is strongLeft
+  rule: if backward is strongForward and sideward is mediumRight then backwardSpeed is strongForward and sidewardSpeed is mediumRight and rotationSpeed is strongRight
+  rule: if backward is mediumBackward then backwardSpeed is mediumBackward
