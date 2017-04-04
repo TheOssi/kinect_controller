@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(kinect_controller)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
-# add_definitions(-std=c++11)
+add_definitions(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_executable(kinect_controller src/main.cpp)
 #set(FL_PATH ../fuzzylite/release/bin/)
 find_library(FL libfuzzylite.so ../fuzzylite/release/bin/)
- target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
    ${catkin_LIBRARIES}
    ${FL}
  )
@@ -128,6 +128,8 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ../fuzzylite/
+  
 )
 
 ## Declare a C++ library
