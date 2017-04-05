@@ -14,6 +14,13 @@ struct point {
 	float z;
 };
 
+struct resultSet{
+	float backwardSpeed;
+	float sidewardSpeed;
+	float upSpeed;
+	float rotationSpeed;
+};
+
 struct jointType {
 	enum {
 		rightHand = 0,
@@ -38,7 +45,7 @@ jointType jType;
 class SkeletonPoints {
 private:
 	static bool instanceFlag;
-	static SkeletonPoints *single;
+	static SkeletonPoints *instance;
 	point points[14];
 
 	SkeletonPoints() {
@@ -56,14 +63,14 @@ public:
 };
 
 bool SkeletonPoints::instanceFlag = false;
-SkeletonPoints* SkeletonPoints::single = NULL;
+SkeletonPoints* SkeletonPoints::instance = NULL;
 SkeletonPoints* SkeletonPoints::getInstance() {
 	if (!instanceFlag) {
-		single = new SkeletonPoints();
+		instance = new SkeletonPoints();
 		instanceFlag = true;
-		return single;
+		return instance;
 	} else {
-		return single;
+		return instance;
 	}
 }
 
@@ -78,16 +85,37 @@ point SkeletonPoints::getJoint(int joint) {
 
 class fuzzyController{
 	private:
-		Engine* engine;
+		static bool instanceFlag;
+		static fuzzyController *instance;
+	    Engine* engine;
 		InputVariable* backward;
 		InputVariable* sideward;
 		InputVariable* up;
 		InputVariable* rotation;
 		OutputVariable* backwardSpeed;
+		OutputVariable* sidewardSpeed;
+		OutputVariable* upSpeed;
+		OutputVariable* rotationSpeed;
+
 	public:
+		static fuzzyController* getInstance();
 		void init();
-		void getFISResult(float, float, float ,float);
+		resultSet getFISResult(float, float, float ,float);
+		~fuzzyController() {
+			instanceFlag = false;
+		}
 };
+bool fuzzyController::instanceFlag = false;
+fuzzyController* fuzzyController::instance = NULL;
+fuzzyController* fuzzyController::getInstance() {
+	if (!instanceFlag) {
+		instance = new fuzzyController();
+		instanceFlag = true;
+		return instance;
+	} else {
+		return instance;
+	}
+}
 
 void fuzzyController::init(){
 	engine = new Engine;
@@ -162,7 +190,7 @@ void fuzzyController::init(){
 	backwardSpeed->addTerm(new Trapezoid("zero", -0.800, -0.500, 0.500, 0.800));
 	engine->addOutputVariable(backwardSpeed);
 
-	OutputVariable* sidewardSpeed = new OutputVariable;
+	sidewardSpeed = new OutputVariable;
 	sidewardSpeed->setName("sidewardSpeed");
 	sidewardSpeed->setDescription("");
 	sidewardSpeed->setEnabled(true);
@@ -179,7 +207,7 @@ void fuzzyController::init(){
 	sidewardSpeed->addTerm(new Trapezoid("zero", -0.800, -0.500, 0.500, 0.800));
 	engine->addOutputVariable(sidewardSpeed);
 
-	OutputVariable* upSpeed = new OutputVariable;
+	upSpeed = new OutputVariable;
 	upSpeed->setName("upSpeed");
 	upSpeed->setDescription("");
 	upSpeed->setEnabled(true);
@@ -196,7 +224,7 @@ void fuzzyController::init(){
 	upSpeed->addTerm(new Trapezoid("zero", -0.800, -0.500, 0.500, 0.800));
 	engine->addOutputVariable(upSpeed);
 
-	OutputVariable* rotationSpeed = new OutputVariable;
+	rotationSpeed = new OutputVariable;
 	rotationSpeed->setName("rotationSpeed");
 	rotationSpeed->setDescription("");
 	rotationSpeed->setEnabled(true);
@@ -256,22 +284,29 @@ void fuzzyController::init(){
 	engine->addRuleBlock(ruleBlock);
 }
 
-void fuzzyController::getFISResult(float back, float side, float upValue, float rotateRight){
+resultSet fuzzyController::getFISResult(float back, float side, float upValue, float rotateRight){
     std::string status;
     if (not engine->isReady(&status))
         throw Exception("[engine error] engine is not ready:n" + status, FL_AT);
     backward->setValue(back);
-    //sideward->setValue(side);
-    //up->setValue(upValue);
-    //rotation->setValue(rotateRight);
+    sideward->setValue(side);
+    up->setValue(upValue);
+    rotation->setValue(rotateRight);
     engine->process();
 
-  FL_LOG(Op::str(backwardSpeed->getValue()));
+    resultSet result;
+    result.backwardSpeed = backwardSpeed->getValue();
+    result.sidewardSpeed = sidewardSpeed->getValue();
+    result.upSpeed = upSpeed->getValue();
+    result.rotationSpeed = rotationSpeed->getValue();
+
+  return result;
 }
 
 void messageCallback(const tf2_msgs::TFMessage::ConstPtr& msg) {
-	SkeletonPoints* points;
-	points = SkeletonPoints::getInstance();
+	SkeletonPoints* points = SkeletonPoints::getInstance();
+	fuzzyController* fc = fuzzyController::getInstance();
+	float up,rotateRight,back,side;
 	float x = msg->transforms[0].transform.translation.x;
 	float y = msg->transforms[0].transform.translation.y;
 	float z = msg->transforms[0].transform.translation.z;
@@ -326,19 +361,26 @@ void messageCallback(const tf2_msgs::TFMessage::ConstPtr& msg) {
 	else if (childframe == "head_1") {
 		points->setJoint(jType.head, x, y, z);
 	}
+
+	//calculate joint diffs
+	//might need to smooth Signal
+	up = points->getJoint(jType.leftHand).y - points->getJoint(jType.leftShoulder).y + points->getJoint(jType.rightHand).y - points->getJoint(jType.rightShoulder).y;
+	side = points->getJoint(jType.leftHand).y - points->getJoint(jType.rightHand).y;
+	rotateRight = points->getJoint(jType.rightHand).z  -points->getJoint(jType.leftHand).z;
+	back = points->getJoint(jType.neck).z - points->getJoint(jType.torso).z;
+	resultSet resultSpeeds = fc->getFISResult(back,side,up,rotateRight);
+	ROS_INFO("backSpeed: %d", resultSpeeds.backwardSpeed);
 }
 
 int main(int argc, char **argv) {
-    fuzzyController fc;
-    fc.init();
-    fc.getFISResult(1.0,1.0,1.0,1.0);
-    /*ros::init(argc, argv, "listener");
-	//ros::NodeHandle n;
 
-	//ros::Subscriber sub = n.subscribe("/tf", 1000, messageCallback);
+   ros::init(argc, argv, "listener");
+   ros::NodeHandle n;
+   fuzzyController::getInstance()->init();
+   ros::Subscriber sub = n.subscribe("/tf", 1000, messageCallback);
 
-	ros::spin();
-*/
+   ros::spin();
+
 	return 0;
 }
 
