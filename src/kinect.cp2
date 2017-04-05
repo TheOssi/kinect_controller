@@ -1,3 +1,5 @@
+#include <fl/fuzzylite.h>
+
 using namespace fl;
 
 Engine* engine = new Engine;
