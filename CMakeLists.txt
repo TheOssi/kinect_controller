@@ -14,13 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
   genmsg
   tf2_msgs
 )
-add_executable(kinect_controller src/main.cpp)
+#add_executable(kinect_controller src/main.cpp)
+#add_executable(main src/main.cpp)
 #set(FL_PATH ../fuzzylite/release/bin/)
-find_library(FL libfuzzylite.so ../fuzzylite/release/bin/)
-target_link_libraries(${PROJECT_NAME}
-   ${catkin_LIBRARIES}
-   ${FL}
- )
 
 #target_link_libraries(kinect_controller ${catkin_LIBRARIES} ${fuzzylite})
 ## System dependencies are found with CMake's conventions
@@ -146,8 +142,13 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/kinect_controller_node.cpp)
-#add_executable(main src/main.cpp)
-#target_link_libraries(main ${catkin_LIBRARIES})
+add_executable(main src/main.cpp)
+find_library(FL libfuzzylite.so ../fuzzylite/release/bin/)
+target_link_libraries(main
+   ${catkin_LIBRARIES}
+   ${FL}
+ )
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use

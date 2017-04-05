@@ -83,6 +83,7 @@ class fuzzyController{
 		InputVariable* sideward;
 		InputVariable* up;
 		InputVariable* rotation;
+		OutputVariable* backwardSpeed;
 	public:
 		void init();
 		void getFISResult(float, float, float ,float);
@@ -144,7 +145,7 @@ void fuzzyController::init(){
 	rotation->addTerm(new Trapezoid("zero", -0.600, -0.200, 0.200, 0.600));
 	engine->addInputVariable(rotation);
 
-	OutputVariable* backwardSpeed = new OutputVariable;
+	backwardSpeed = new OutputVariable;
 	backwardSpeed->setName("backwardSpeed");
 	backwardSpeed->setDescription("");
 	backwardSpeed->setEnabled(true);
@@ -260,10 +261,12 @@ void fuzzyController::getFISResult(float back, float side, float upValue, float 
     if (not engine->isReady(&status))
         throw Exception("[engine error] engine is not ready:n" + status, FL_AT);
     backward->setValue(back);
-    sideward->setValue(side);
-    up->setValue(upValue);
-    rotation->setValue(rotateRight);
+    //sideward->setValue(side);
+    //up->setValue(upValue);
+    //rotation->setValue(rotateRight);
     engine->process();
+
+  FL_LOG(Op::str(backwardSpeed->getValue()));
 }
 
 void messageCallback(const tf2_msgs::TFMessage::ConstPtr& msg) {
@@ -326,14 +329,16 @@ void messageCallback(const tf2_msgs::TFMessage::ConstPtr& msg) {
 }
 
 int main(int argc, char **argv) {
+    fuzzyController fc;
+    fc.init();
+    fc.getFISResult(1.0,1.0,1.0,1.0);
+    /*ros::init(argc, argv, "listener");
+	//ros::NodeHandle n;
 
-	ros::init(argc, argv, "listener");
-	ros::NodeHandle n;
-
-	ros::Subscriber sub = n.subscribe("/tf", 1000, messageCallback);
+	//ros::Subscriber sub = n.subscribe("/tf", 1000, messageCallback);
 
 	ros::spin();
-
+*/
 	return 0;
 }
 
