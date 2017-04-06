@@ -1,8 +1,8 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include <tf2_msgs/TFMessage.h>
-#include "fl/Headers.h"
 #include <string>
+#include "fl/Headers.h"
 
 using namespace fl;
 using namespace std;
@@ -43,14 +43,36 @@ jointType jType;
 
 class SkeletonPoints {
 private:
+	static bool instanceFlag;
+	static SkeletonPoints *instance;
 	point points[14];
 
+	SkeletonPoints() {
+		//private constructor
+	}
 public:
+	static SkeletonPoints* getInstance();
 
 	void setJoint(int, float, float, float);
 	point getJoint(int);
 
+	~SkeletonPoints() {
+		instanceFlag = false;
+	}
 };
+
+bool SkeletonPoints::instanceFlag = false;
+SkeletonPoints* SkeletonPoints::instance = NULL;
+SkeletonPoints* SkeletonPoints::getInstance() {
+	if (!instanceFlag) {
+		instance = new SkeletonPoints();
+		instanceFlag = true;
+		return instance;
+	} else {
+		return instance;
+	}
+}
+
 void SkeletonPoints::setJoint(int joint, float x, float y, float z) {
 	points[joint].x = x;
 	points[joint].y = y;
@@ -60,8 +82,10 @@ point SkeletonPoints::getJoint(int joint) {
 	return points[joint];
 }
 
-class FuzzyController {
+class fuzzyController {
 private:
+	static bool instanceFlag;
+	static fuzzyController *instance;
 	Engine* engine;
 	InputVariable* backward;
 	InputVariable* sideward;
@@ -73,12 +97,27 @@ private:
 	OutputVariable* rotationSpeed;
 
 public:
+	static fuzzyController* getInstance();
 	void init();
 	resultSet getFISResult(float, float, float, float);
-
+	~fuzzyController() {
+		instanceFlag = false;
+	}
 };
+bool fuzzyController::instanceFlag = false;
+fuzzyController* fuzzyController::instance = NULL;
+fuzzyController* fuzzyController::getInstance() {
+	if (!instanceFlag) {
+		instance = new fuzzyController();
+		instanceFlag = true;
+		return instance;
+	} else {
+		return instance;
+	}
+	ROS_INFO("avc");
+}
 
-void FuzzyController::init() {
+void fuzzyController::init() {
 	engine = new Engine;
 	engine->setName("input");
 	engine->setDescription("");
@@ -347,7 +386,7 @@ void FuzzyController::init() {
 	ROS_INFO("Fuzzy Init finished");
 }
 
-resultSet FuzzyController::getFISResult(float back, float side, float upValue,
+resultSet fuzzyController::getFISResult(float back, float side, float upValue,
 		float rotateRight) {
 	std::string status;
 	if (not engine->isReady(&status))
@@ -367,28 +406,11 @@ resultSet FuzzyController::getFISResult(float back, float side, float upValue,
 	return result;
 }
 
-class KinectController {
-private:
-	ros::NodeHandle n;
-	SkeletonPoints sPoints;
-	FuzzyController fController;
+void messageCallback(const tf2_msgs::TFMessage::ConstPtr& msg) {
+	SkeletonPoints* points = SkeletonPoints::getInstance();
+	ROS_INFO("BLA");
+	//fuzzyController* fc = fuzzyController::getInstance();
 
-public:
-	KinectController(ros::NodeHandle &nodeHandle);
-	void messageCallback(const tf2_msgs::TFMessage::ConstPtr& msg);
-};
-
-KinectController::KinectController(ros::NodeHandle &nodeHandle) {
-	sPoints = SkeletonPoints();
-	fController = FuzzyController();
-	fController.init();
-	ros::Subscriber sub = n.subscribe("/tf", 1000,
-			&KinectController::messageCallback, this);
-	ros::spin();
-}
-
-void KinectController::messageCallback(
-	const tf2_msgs::TFMessage::ConstPtr& msg) {
 	float up, rotateRight, back, side;
 	float x = msg->transforms[0].transform.translation.x;
 	float y = msg->transforms[0].transform.translation.y;
@@ -397,68 +419,68 @@ void KinectController::messageCallback(
 
 	//RIGHT HAND
 	if (childframe == "right_hand_1") {
-		sPoints.setJoint(jType.rightHand, x, y, z);
+		points->setJoint(jType.rightHand, x, y, z);
 		//RIGHT ELBOW
 	} else if (childframe == "right_elbow_1") {
-		sPoints.setJoint(jType.rightElbow, x, y, z);
+		points->setJoint(jType.rightElbow, x, y, z);
 		//RIGHT SHOULDER
 	} else if (childframe == "right_shoulder_1") {
-		sPoints.setJoint(jType.rightShoulder, x, y, z);
+		points->setJoint(jType.rightShoulder, x, y, z);
 		//RIGHT HIP
 	} else if (childframe == "right_hip_1") {
-		sPoints.setJoint(jType.rightHip, x, y, z);
+		points->setJoint(jType.rightHip, x, y, z);
 		//RIGHT KNEE
 	} else if (childframe == "right_knee_1") {
-		sPoints.setJoint(jType.rightElbow, x, y, z);
+		points->setJoint(jType.rightElbow, x, y, z);
 		//RIGHT FOOT
 	} else if (childframe == "right_foot_1") {
-		sPoints.setJoint(jType.rightElbow, x, y, z);
+		points->setJoint(jType.rightElbow, x, y, z);
 		//LEFT HAND
 	} else if (childframe == "left_hand_1") {
-		sPoints.setJoint(jType.leftHand, x, y, z);
+		points->setJoint(jType.leftHand, x, y, z);
 		//LEFT ELBOW
 	} else if (childframe == "left_elbow_1") {
-		sPoints.setJoint(jType.leftElbow, x, y, z);
+		points->setJoint(jType.leftElbow, x, y, z);
 		//LEFT SHOULDER
 	} else if (childframe == "left_shoulder_1") {
-		sPoints.setJoint(jType.leftShoulder, x, y, z);
+		points->setJoint(jType.leftShoulder, x, y, z);
 		//LEFT HIP
 	} else if (childframe == "left_hip_1") {
-		sPoints.setJoint(jType.leftHip, x, y, z);
+		points->setJoint(jType.leftHip, x, y, z);
 		//LEFT KNEE
 	} else if (childframe == "left_knee_1") {
-		sPoints.setJoint(jType.leftElbow, x, y, z);
+		points->setJoint(jType.leftElbow, x, y, z);
 		//LEFT FOOT
 	} else if (childframe == "left_foot_1") {
-		sPoints.setJoint(jType.leftElbow, x, y, z);
+		points->setJoint(jType.leftElbow, x, y, z);
 	}
 	//TORSO
 	else if (childframe == "torso_1") {
-		sPoints.setJoint(jType.torso, x, y, z);
+		points->setJoint(jType.torso, x, y, z);
 	}
 	//NECK
 	else if (childframe == "neck_1") {
-		sPoints.setJoint(jType.neck, x, y, z);
+		points->setJoint(jType.neck, x, y, z);
 	}
 	//HEAD
 	else if (childframe == "head_1") {
-		sPoints.setJoint(jType.head, x, y, z);
+		points->setJoint(jType.head, x, y, z);
 	}
 
 	//calculate joint diffs
 	//might need to smooth Signal
-	up = sPoints.getJoint(jType.leftHand).y
-			- sPoints.getJoint(jType.leftShoulder).y
-			+ sPoints.getJoint(jType.rightHand).y
-			- sPoints.getJoint(jType.rightShoulder).y;
-	side = sPoints.getJoint(jType.leftHand).y
-			- sPoints.getJoint(jType.rightHand).y;
-	rotateRight = sPoints.getJoint(jType.rightHand).z
-			- sPoints.getJoint(jType.leftHand).z;
-	back = sPoints.getJoint(jType.neck).z - sPoints.getJoint(jType.torso).z;
+	up = points->getJoint(jType.leftHand).y
+			- points->getJoint(jType.leftShoulder).y
+			+ points->getJoint(jType.rightHand).y
+			- points->getJoint(jType.rightShoulder).y;
+	side = points->getJoint(jType.leftHand).y
+			- points->getJoint(jType.rightHand).y;
+	rotateRight = points->getJoint(jType.rightHand).z
+			- points->getJoint(jType.leftHand).z;
+	back = points->getJoint(jType.neck).z - points->getJoint(jType.torso).z;
 	if (up < 2.0 && up > -2.0 && side < 2.0 && side > -2.0 && rotateRight < 2.0
 			&& rotateRight > -2.0 && back < 2.0 && back > -2.0) {
-		resultSet resultSpeeds = fController.getFISResult(
+		resultSet resultSpeeds = fuzzyController::getInstance()->getFISResult(
 				back, side, up, rotateRight);
 		ROS_INFO("backSpeed: %.2f| %.2f", up, resultSpeeds.backwardSpeed);
 	}
@@ -467,10 +489,15 @@ void KinectController::messageCallback(
 int main(int argc, char **argv) {
 
 	ros::init(argc, argv, "listener");
-
 	ros::NodeHandle n;
-
-	KinectController controller(n);
+	fuzzyController::getInstance()->init();
+	ros::Subscriber sub = n.subscribe("/tf", 1000, messageCallback);
+//   for(int i=0;i<100000;i++){
+//	   resultSet resultSpeeds = fuzzyController::getInstance()->getFISResult(1.0,0.5,0.5,0.5);
+//	   ROS_INFO("%d backSpeed: %.2f",i, resultSpeeds.backwardSpeed);
+//   }
+	ros::spin();
 
 	return 0;
 }
+
