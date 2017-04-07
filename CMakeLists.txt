@@ -13,6 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   genmsg
   tf2_msgs
+  ardrone_autonomy
+  nav_msgs
 )
 #add_executable(kinect_controller src/main.cpp)
 #add_executable(main src/main.cpp)
@@ -143,11 +145,18 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/kinect_controller_node.cpp)
 add_executable(main src/main.cpp)
+
+add_executable(drone_control src/drone_controller.cpp)
+
 find_library(FL libfuzzylite.so ../fuzzylite/release/bin/)
 target_link_libraries(main
    ${catkin_LIBRARIES}
    ${FL}
  )
+ 
+ target_link_libraries(drone_control
+   ${catkin_LIBRARIES}
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
