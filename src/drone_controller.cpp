@@ -6,6 +6,21 @@
 #include <geometry_msgs/Twist.h>
 #include <cstdint>
 
+struct droneStatus{
+	enum{
+		Emergency = 0,
+		Inited    = 1,
+		Landed    = 2,
+		Flying    = 3,
+		Hovering  = 4,
+		Test      = 5,
+		TakingOff = 6,
+		GotoHover = 7,
+		Landing   = 8,
+		Looping   = 9
+	};
+};
+
 class Drone_controller {
 private:
 	bool landed;
@@ -20,12 +35,13 @@ public:
 	void land();
 	void reset();
 	void navdataCallback(const ardrone_autonomy::Navdata& msg_in);
+	void steerCallback();
 	void setCommand(float roll, float pitch, float yaw, float z_velocity);
 	void sendCommand();
 };
 
 void Drone_controller::takeoff() {
-	if (drone_state == 2) { //2 == Landed
+	if (drone_state == droneStatus::Landed) {
 		system("rostopic pub -1 /ardrone/takeoff std_msgs/Empty");
 	}
 }
@@ -42,6 +58,11 @@ void Drone_controller::navdataCallback(
 		const ardrone_autonomy::Navdata& msg_in) {
 	drone_state = msg_in.state;
 }
+
+void Drone_controller::steerCallback(){
+
+}
+
 void Drone_controller::setCommand(float roll, float pitch, float yaw,
 		float z_velocity) {
 	command.linear.x = pitch;
@@ -50,7 +71,7 @@ void Drone_controller::setCommand(float roll, float pitch, float yaw,
 	command.angular.z = yaw;
 }
 void Drone_controller::sendCommand() {
-	if (drone_state == 3 || drone_state == 4 || drone_state == 7) {
+	if (drone_state == droneStatus::Flying || drone_state == droneStatus::GotoHover || drone_state == droneStatus::Hovering) {
 		commandPublisher.publish(command);
 	}
 }
@@ -60,6 +81,15 @@ Drone_controller::Drone_controller(ros::NodeHandle nh) {
 	navdataSubscriber = nodeHandle.subscribe("/ardrone/navdata", 1,
 			&Drone_controller::navdataCallback, this);
 	commandPublisher = nodeHandle.advertise<geometry_msgs::Twist>("/cmd_vel",1);
+
+	//50 hz publish Rate
+	ros::Rate loop_rate(50);
+	 while (ros::ok())
+	  {
+		sendCommand();
+	    ros::spinOnce();
+	    loop_rate.sleep();
+	}
 }
 
 int main(int argc, char **argv) {
