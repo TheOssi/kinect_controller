@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_msgs
   ardrone_autonomy
   nav_msgs
+  message_generation
 )
 #add_executable(kinect_controller src/main.cpp)
 #add_executable(main src/main.cpp)
@@ -77,7 +78,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
-   droneSpeed.msg
+   std_msgs
 )
 
 ################################################
@@ -112,8 +113,9 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES kinect_controller
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+ CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
+
 )
 
 ###########

@@ -3,6 +3,7 @@
 #include <tf2_msgs/TFMessage.h>
 #include "fl/Headers.h"
 #include <string>
+#include <kinect_controller/droneSpeeds.h>
 
 using namespace fl;
 using namespace std;
@@ -372,6 +373,7 @@ private:
 	ros::NodeHandle n;
 	SkeletonPoints sPoints;
 	FuzzyController fController;
+	ros::Publisher commandPublisher;
 	int count = 0;
 public:
 	KinectController(ros::NodeHandle &nodeHandle);
@@ -382,6 +384,7 @@ KinectController::KinectController(ros::NodeHandle &nodeHandle) {
 	sPoints = SkeletonPoints();
 	fController = FuzzyController();
 	fController.init();
+	ros::Publisher pubCommand = n.advertise<kinect_controller::droneSpeeds>("/drone_command",1);
 	ros::Subscriber sub = n.subscribe("/tf", 1000,
 			&KinectController::messageCallback, this);
 	ros::spin();
@@ -394,6 +397,7 @@ void KinectController::messageCallback(
 	float y = msg->transforms[0].transform.translation.y;
 	float z = msg->transforms[0].transform.translation.z;
 	string childframe(msg->transforms[0].child_frame_id.c_str());
+	kinect_controller::droneSpeeds commandMessage;
 
 	//RIGHT HAND
 	if (childframe == "right_hand_1") {
@@ -478,6 +482,11 @@ void KinectController::messageCallback(
 			fController.init();
 			resultSet resultSpeeds = fController.getFISResult(back, side, up,
 					rotateRight);
+			commandMessage.backSpeed = resultSpeeds.backwardSpeed;
+			commandMessage.rotateRight = resultSpeeds.rotationSpeed;
+			commandMessage.sideSpeed = resultSpeeds.sidewardSpeed;
+			commandMessage.upSpeed = resultSpeeds.upSpeed;
+			commandPublisher.publish(commandMessage);
 		}
 	}
 }

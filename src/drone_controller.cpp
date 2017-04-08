@@ -4,6 +4,7 @@
 #include <nav_msgs/Odometry.h>
 #include <ardrone_autonomy/Navdata.h>
 #include <geometry_msgs/Twist.h>
+#include <kinect_controller/droneSpeeds.h>
 #include <cstdint>
 
 struct droneStatus{
@@ -27,6 +28,7 @@ private:
 	int drone_state;
 	ros::NodeHandle nodeHandle;
 	ros::Subscriber navdataSubscriber;
+	ros::Subscriber commandSubscriber;
 	ros::Publisher commandPublisher;
 	geometry_msgs::Twist command;
 public:
@@ -34,8 +36,8 @@ public:
 	void takeoff();
 	void land();
 	void reset();
-	void navdataCallback(const ardrone_autonomy::Navdata& msg_in);
-	void steerCallback();
+	void navdataCallback(const ardrone_autonomy::Navdata& msg);
+	void commandCallback(const kinect_controller::droneSpeeds& msg);
 	void setCommand(float roll, float pitch, float yaw, float z_velocity);
 	void sendCommand();
 };
@@ -55,12 +57,12 @@ void Drone_controller::reset() {
 }
 
 void Drone_controller::navdataCallback(
-		const ardrone_autonomy::Navdata& msg_in) {
-	drone_state = msg_in.state;
+		const ardrone_autonomy::Navdata& msg) {
+	drone_state = msg.state;
 }
 
-void Drone_controller::steerCallback(){
-
+void Drone_controller::commandCallback(const kinect_controller::droneSpeeds& msg){
+	setCommand(msg.sideSpeed,msg.backSpeed,msg.rotateRight,msg.upSpeed);
 }
 
 void Drone_controller::setCommand(float roll, float pitch, float yaw,
@@ -78,8 +80,11 @@ void Drone_controller::sendCommand() {
 
 Drone_controller::Drone_controller(ros::NodeHandle nh) {
 	nodeHandle = nh;
+	//subscribes to Navdata from Drone
 	navdataSubscriber = nodeHandle.subscribe("/ardrone/navdata", 1,
 			&Drone_controller::navdataCallback, this);
+	commandSubscriber = nodeHandle.subscribe("/drone_command",1,&Drone_controller::commandCallback,this);
+	//Publishes Command to ardrone_autonomy
 	commandPublisher = nodeHandle.advertise<geometry_msgs::Twist>("/cmd_vel",1);
 
 	//50 hz publish Rate
