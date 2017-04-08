@@ -384,7 +384,7 @@ KinectController::KinectController(ros::NodeHandle &nodeHandle) {
 	sPoints = SkeletonPoints();
 	fController = FuzzyController();
 	fController.init();
-	ros::Publisher pubCommand = n.advertise<kinect_controller::droneSpeeds>("/drone_command",1);
+	commandPublisher = n.advertise<kinect_controller::droneSpeeds>("/drone_command",1);
 	ros::Subscriber sub = n.subscribe("/tf", 1000,
 			&KinectController::messageCallback, this);
 	ros::spin();

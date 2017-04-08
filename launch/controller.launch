@@ -1,0 +1,11 @@
+<launch>
+	
+	<node name="main" pkg="kinect_controller" type="main" required="true"/>
+
+	<node name="drone_controller" pkg="kinect_controller" type="drone_controller" required="true"/>
+
+  	<node pkg="openni_tracker" name="openni_tracker" type="openni_tracker" output="screen">
+	    	<param name="fixed_frame" value="openni_depth_frame" />
+  	</node>
+
+</launch>

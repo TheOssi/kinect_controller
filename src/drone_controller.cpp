@@ -106,6 +106,7 @@ int main(int argc, char **argv) {
 
 	ros::Publisher pub_empty;
 	Drone_controller dc(node);
+	dc.takeoff();
 
 }
 
