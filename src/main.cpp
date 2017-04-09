@@ -351,7 +351,7 @@ resultSet FuzzyController::getFISResult(float back, float side, float upValue,
 		float rotateRight) {
 
 	resultSet result;
-	ROS_INFO("%.8f| %.2f | %.2f | %.2f", back, side, upValue, rotateRight);
+	//ROS_INFO("%.2f| %.2f | %.2f | %.2f", back, side, upValue, rotateRight);
 	InputVariable* backward = engine->getInputVariable("backward");
 	backward->setValue(back);
 	sideward->setValue(side);
@@ -466,15 +466,15 @@ void KinectController::messageCallback(
 	if (count>=14) {
 		//calculate joint diffs
 		//might need to smooth Signal
-		up = sPoints.getJoint(jType.leftHand).y
-				- sPoints.getJoint(jType.leftShoulder).y
-				+ sPoints.getJoint(jType.rightHand).y
-				- sPoints.getJoint(jType.rightShoulder).y;
-		side = sPoints.getJoint(jType.leftHand).y
-				- sPoints.getJoint(jType.rightHand).y;
-		rotateRight = sPoints.getJoint(jType.rightHand).z
-				- sPoints.getJoint(jType.leftHand).z;
-		back = sPoints.getJoint(jType.neck).z - sPoints.getJoint(jType.torso).z;
+		up = sPoints.getJoint(jType.leftHand).z
+				- sPoints.getJoint(jType.leftShoulder).z
+				+ sPoints.getJoint(jType.rightHand).z
+				- sPoints.getJoint(jType.rightShoulder).z;
+		side = sPoints.getJoint(jType.leftHand).z
+				- sPoints.getJoint(jType.rightHand).z;
+		rotateRight = sPoints.getJoint(jType.rightHand).x
+				- sPoints.getJoint(jType.leftHand).x;
+		back = sPoints.getJoint(jType.neck).x - sPoints.getJoint(jType.torso).x;
 
 		if (up < 2.0 && up > -2.0 && side < 2.0 && side > -2.0
 				&& rotateRight < 2.0 && rotateRight > -2.0 && back < 2.0
@@ -486,6 +486,7 @@ void KinectController::messageCallback(
 			commandMessage.rotateRight = resultSpeeds.rotationSpeed;
 			commandMessage.sideSpeed = resultSpeeds.sidewardSpeed;
 			commandMessage.upSpeed = resultSpeeds.upSpeed;
+			ROS_INFO("back: %.2f | rotate: %.2f| side: %.2f |up: %.2f",resultSpeeds.backwardSpeed, resultSpeeds.rotationSpeed,resultSpeeds.sidewardSpeed,resultSpeeds.upSpeed);
 			commandPublisher.publish(commandMessage);
 		}
 	}

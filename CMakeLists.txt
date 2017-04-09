@@ -17,9 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   message_generation
 )
-#add_executable(kinect_controller src/main.cpp)
-#add_executable(main src/main.cpp)
-#set(FL_PATH ../fuzzylite/release/bin/)
+
 
 #target_link_libraries(kinect_controller ${catkin_LIBRARIES} ${fuzzylite})
 ## System dependencies are found with CMake's conventions
@@ -147,7 +145,7 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/kinect_controller_node.cpp)
 add_executable(main src/main.cpp)
 
-add_executable(drone_control src/drone_controller.cpp)
+add_executable(drone_controller src/drone_controller.cpp)
 
 find_library(FL libfuzzylite.so ../fuzzylite/release/bin/)
 target_link_libraries(main
@@ -155,7 +153,7 @@ target_link_libraries(main
    ${FL}
  )
  
- target_link_libraries(drone_control
+ target_link_libraries(drone_controller
    ${catkin_LIBRARIES}
 )
 

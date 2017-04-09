@@ -44,11 +44,13 @@ public:
 
 void Drone_controller::takeoff() {
 	if (drone_state == droneStatus::Landed) {
+		ROS_INFO("Drone Takeoff");
 		system("rostopic pub -1 /ardrone/takeoff std_msgs/Empty");
 	}
 }
 
 void Drone_controller::land() {
+	ROS_INFO("Landing");
 	system("rostopic pub -1 /ardrone/land std_msgs/Empty");
 }
 
@@ -99,7 +101,6 @@ Drone_controller::Drone_controller(ros::NodeHandle nh) {
 
 int main(int argc, char **argv) {
 	std_msgs::Empty emp_msg;
-	ROS_INFO("Flying ARdrone");
 
 	ros::init(argc, argv, "ARDrone_test");
 	ros::NodeHandle node;
