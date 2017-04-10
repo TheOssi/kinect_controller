@@ -130,9 +130,12 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/kinect_controller.cpp
-# )
+ add_library(fuzzy
+   src/FuzzyController.cpp
+ )
+  add_library(skeletonpoints
+   src/SkeletonPoints.cpp
+ )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -143,14 +146,24 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/kinect_controller_node.cpp)
-add_executable(main src/main.cpp)
+add_executable(main src/KinectController.cpp)
 
-add_executable(drone_controller src/drone_controller.cpp)
+add_executable(drone_controller src/DroneController.cpp)
 
 find_library(FL libfuzzylite.so ../fuzzylite/release/bin/)
+target_link_libraries(fuzzy
+   ${catkin_LIBRARIES}
+   ${FL}
+ )
+ target_link_libraries(skeletonpoints
+   ${catkin_LIBRARIES}
+ )
+ 
 target_link_libraries(main
    ${catkin_LIBRARIES}
    ${FL}
+   skeletonpoints
+   fuzzy
  )
  
  target_link_libraries(drone_controller
