@@ -27,18 +27,18 @@ void Drone_controller::commandCallback(
 
 void Drone_controller::setCommand(float roll, float pitch, float yaw,
 		float z_velocity) {
-	command.linear.x = pitch;
+	command.linear.x = -1.0 * pitch;
 	command.linear.y = roll;
 	command.linear.z = z_velocity;
 	command.angular.z = yaw;
 }
 void Drone_controller::sendCommand() {
-	if (drone_state == droneStatus::Landed && command.linear.z >= 0.5) {
+	if (drone_state == droneStatus::Landed && command.linear.z >= 0.80) {
 		takeoff();
 	} else if (drone_state == droneStatus::Flying
 			|| drone_state == droneStatus::GotoHover
 			|| drone_state == droneStatus::Hovering) {
-		if (command.linear.z <= -0.3) {
+		if (command.linear.z <= -0.8) {
 			land();
 		} else {
 			commandPublisher.publish(command);
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
 
 	ros::Publisher pub_empty;
 	Drone_controller dc(node);
-	dc.takeoff();
+	dc.land();
 
 }
 
