@@ -1,4 +1,3 @@
-
 //struct for 3D Points
 struct point {
 	float x;

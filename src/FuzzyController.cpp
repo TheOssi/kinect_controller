@@ -1,4 +1,5 @@
 #include "FuzzyController.h"
+
 void FuzzyController::init() {
 	engine = new Engine;
 	engine->setName("input");
