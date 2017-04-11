@@ -25,7 +25,7 @@ struct droneStatus{
 class Drone_controller {
 private:
 	bool landed;
-	int drone_state;
+	int drone_state=2;
 	ros::NodeHandle nodeHandle;
 	ros::Subscriber navdataSubscriber;
 	ros::Subscriber commandSubscriber;

@@ -18,10 +18,10 @@ struct jointType {
 		rightKnee = 8,
 		leftHip = 9,
 		leftKnee = 10,
-		leftFoot = 11,
+		leftElbow = 11,
 		leftShoulder = 12,
-		leftElbow = 13,
-		leftHand = 14
+		leftHand = 13,
+		leftFoot = 14
 	};
 };
 //Class storing the Joints
