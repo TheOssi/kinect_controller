@@ -5,7 +5,8 @@ KinectController::KinectController(ros::NodeHandle &nodeHandle) {
 	sPoints = SkeletonPoints();
 	fController = FuzzyController();
 	fController.init();
-	commandPublisher = n.advertise<kinect_controller::droneSpeeds>("/drone_command",1);
+	commandPublisher = n.advertise<kinect_controller::droneSpeeds>(
+			"/drone_command", 1);
 	ros::Subscriber sub = n.subscribe("/tf", 1000,
 			&KinectController::messageCallback, this);
 	ros::spin();
@@ -84,7 +85,7 @@ void KinectController::messageCallback(
 		sPoints.setJoint(jointType::head, x, y, z);
 		count++;
 	}
-	if (count>=14) {
+	if (count >= 14) {
 		//calculate joint diffs
 		//might need to smooth Signal
 		up = sPoints.getJoint(jointType::leftHand).z
@@ -95,23 +96,23 @@ void KinectController::messageCallback(
 				- sPoints.getJoint(jointType::rightHand).z;
 		rotateRight = sPoints.getJoint(jointType::rightHand).x
 				- sPoints.getJoint(jointType::leftHand).x;
-		back = sPoints.getJoint(jointType::neck).x - sPoints.getJoint(jointType::torso).x;
+		back = sPoints.getJoint(jointType::neck).x
+				- sPoints.getJoint(jointType::torso).x;
 
-		if (up < 1.0 && up > -1.0 && side < 1.0 && side > -1.0
-				&& rotateRight < 1.0 && rotateRight > -1.0 && back < 1.0
-				&& back > -1.0) {
-			fController.init();
-			resultSet resultSpeeds = fController.getFISResult(back, side, up,
-					rotateRight);
-			commandMessage.backSpeed = resultSpeeds.backwardSpeed * 4.0;
-			commandMessage.rotateRight = resultSpeeds.rotationSpeed;
-			commandMessage.sideSpeed = resultSpeeds.sidewardSpeed;
-			commandMessage.upSpeed = resultSpeeds.upSpeed;
-			ROS_INFO("back: %.2f | rotate: %.2f| side: %.2f |up: %.2f",resultSpeeds.backwardSpeed, resultSpeeds.rotationSpeed,resultSpeeds.sidewardSpeed,resultSpeeds.upSpeed);
-			//ROS_INFO("left: %.2f | right: %.2f | rot: %.2f",sPoints.getJoint(jointType::rightHand).x,sPoints.getJoint(jointType::leftHand).x,resultSpeeds.rotationSpeed);
+		//fController.init();
+		resultSet resultSpeeds = fController.getFISResult(back, side, up,
+				rotateRight);
+		commandMessage.backSpeed = resultSpeeds.backwardSpeed * 2.0;
+		commandMessage.rotateRight = resultSpeeds.rotationSpeed;
+		commandMessage.sideSpeed = resultSpeeds.sidewardSpeed;
+		commandMessage.upSpeed = resultSpeeds.upSpeed;
+		ROS_INFO("back: %.2f | rotate: %.2f| side: %.2f |up: %.2f",
+				resultSpeeds.backwardSpeed, resultSpeeds.rotationSpeed,
+				resultSpeeds.sidewardSpeed, resultSpeeds.upSpeed);
+		//ROS_INFO("left: %.2f | right: %.2f | rot: %.2f",sPoints.getJoint(jointType::rightHand).x,sPoints.getJoint(jointType::leftHand).x,resultSpeeds.rotationSpeed);
 
-			commandPublisher.publish(commandMessage);
-		}
+		commandPublisher.publish(commandMessage);
+
 	}
 }
 

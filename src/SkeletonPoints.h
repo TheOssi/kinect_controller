@@ -27,7 +27,7 @@ struct jointType {
 //Class storing the Joints
 class SkeletonPoints {
 private:
-	point points[14];
+	point points[15];
 
 public:
 	void setJoint(int, float, float, float);

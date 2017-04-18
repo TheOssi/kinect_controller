@@ -33,7 +33,7 @@ void Drone_controller::setCommand(float roll, float pitch, float yaw,
 	command.angular.z = yaw;
 }
 void Drone_controller::sendCommand() {
-	if (drone_state == droneStatus::Landed && command.linear.z >= 0.80) {
+	if (drone_state == droneStatus::Landed && command.linear.z >= 0.70) {
 		takeoff();
 	} else if (drone_state == droneStatus::Flying
 			|| drone_state == droneStatus::GotoHover
@@ -58,7 +58,7 @@ Drone_controller::Drone_controller(ros::NodeHandle nh) {
 			1);
 
 	//50 hz publish Rate
-	ros::Rate loop_rate(50);
+	ros::Rate loop_rate(100);
 	while (ros::ok()) {
 		sendCommand();
 		ros::spinOnce();

@@ -11,13 +11,13 @@ void FuzzyController::init() {
 	backward->setRange(-1.000, 1.000);
 	backward->setLockValueInRange(false);
 	backward->addTerm(
-			new Trapezoid("strongForward", -2.000, -2.000, -0.800, -0.400));
+			new Trapezoid("strongForward", -1.000, -1.000, -0.800, -0.400));
 	backward->addTerm(
 			new Trapezoid("mediumForward", -0.900, -0.600, -0.400, 0.000));
 	backward->addTerm(
 			new Trapezoid("mediumBackward", 0.000, 0.400, 0.600, 0.900));
 	backward->addTerm(
-			new Trapezoid("strongBackward", 0.400, 0.800, 2.000, 2.000));
+			new Trapezoid("strongBackward", 0.400, 0.800, 1.000, 1.000));
 	backward->addTerm(new Trapezoid("zero", -0.600, -0.200, 0.200, 0.600));
 	engine->addInputVariable(backward);
 
@@ -28,11 +28,11 @@ void FuzzyController::init() {
 	sideward->setRange(-1.000, 1.000);
 	sideward->setLockValueInRange(false);
 	sideward->addTerm(
-			new Trapezoid("strongLeft", -2.000, -2.000, -0.800, -0.400));
+			new Trapezoid("strongLeft", -1.000, -1.000, -0.800, -0.400));
 	sideward->addTerm(
 			new Trapezoid("mediumLeft", -0.900, -0.600, -0.400, 0.000));
 	sideward->addTerm(new Trapezoid("mediumRight", 0.000, 0.400, 0.600, 0.900));
-	sideward->addTerm(new Trapezoid("strongRight", 0.400, 0.800, 2.000, 2.000));
+	sideward->addTerm(new Trapezoid("strongRight", 0.400, 0.800, 1.000, 1.000));
 	sideward->addTerm(new Trapezoid("zero", -0.600, -0.200, 0.200, 0.600));
 	engine->addInputVariable(sideward);
 
@@ -42,10 +42,10 @@ void FuzzyController::init() {
 	up->setEnabled(true);
 	up->setRange(-1.000, 1.000);
 	up->setLockValueInRange(false);
-	up->addTerm(new Trapezoid("strongDown", -2.000, -2.000, -0.800, -0.400));
+	up->addTerm(new Trapezoid("strongDown", -1.000, -1.000, -0.800, -0.400));
 	up->addTerm(new Trapezoid("mediumDown", -0.900, -0.600, -0.400, 0.000));
 	up->addTerm(new Trapezoid("mediumUp", 0.000, 0.400, 0.600, 0.900));
-	up->addTerm(new Trapezoid("strongUp", 0.400, 0.800, 2.000, 2.000));
+	up->addTerm(new Trapezoid("strongUp", 0.400, 0.800, 1.000, 1.000));
 	up->addTerm(new Trapezoid("zero", -0.600, -0.200, 0.200, 0.600));
 	engine->addInputVariable(up);
 
@@ -56,11 +56,11 @@ void FuzzyController::init() {
 	rotation->setRange(-1.000, 1.000);
 	rotation->setLockValueInRange(false);
 	rotation->addTerm(
-			new Trapezoid("strongLeft", -2.000, -2.000, -0.800, -0.400));
+			new Trapezoid("strongLeft", -1.000, -1.000, -0.800, -0.400));
 	rotation->addTerm(
 			new Trapezoid("mediumLeft", -0.900, -0.600, -0.400, 0.000));
 	rotation->addTerm(new Trapezoid("mediumRight", 0.000, 0.400, 0.600, 0.900));
-	rotation->addTerm(new Trapezoid("strongRight", 0.400, 0.800, 2.000, 2.000));
+	rotation->addTerm(new Trapezoid("strongRight", 0.400, 0.800, 1.000, 1.000));
 	rotation->addTerm(new Trapezoid("zero", -0.600, -0.200, 0.200, 0.600));
 	engine->addInputVariable(rotation);
 
@@ -75,12 +75,12 @@ void FuzzyController::init() {
 	backwardSpeed->setDefaultValue(fl::nan);
 	backwardSpeed->setLockPreviousValue(false);
 	backwardSpeed->addTerm(
-			new Triangle("strongForward", -1.200, -1.000, -0.700));
+			new Trapezoid("strongForward", -1.000, -1.000, -1.000, -0.700));
 	backwardSpeed->addTerm(
 			new Trapezoid("mediumForward", -1.000, -0.850, -0.600, -0.250));
 	backwardSpeed->addTerm(
 			new Trapezoid("mediumBackward", 0.250, 0.600, 0.850, 1.000));
-	backwardSpeed->addTerm(new Triangle("strongBackward", 0.700, 1.000, 2.200));
+	backwardSpeed->addTerm(new Trapezoid("strongBackward", 0.700, 1.000,  1.000, 1.000));
 	backwardSpeed->addTerm(new Trapezoid("zero", -0.800, -0.500, 0.500, 0.800));
 	engine->addOutputVariable(backwardSpeed);
 
@@ -94,12 +94,12 @@ void FuzzyController::init() {
 	sidewardSpeed->setDefuzzifier(new Centroid(100));
 	sidewardSpeed->setDefaultValue(fl::nan);
 	sidewardSpeed->setLockPreviousValue(false);
-	sidewardSpeed->addTerm(new Triangle("strongLeft", -1.200, -1.000, -0.700));
+	sidewardSpeed->addTerm(new Trapezoid("strongLeft", -1.000,-1.000, -1.000, -0.700));
 	sidewardSpeed->addTerm(
 			new Trapezoid("mediumLeft", -1.000, -0.850, -0.600, -0.250));
 	sidewardSpeed->addTerm(
 			new Trapezoid("mediumRight", 0.250, 0.600, 0.850, 1.000));
-	sidewardSpeed->addTerm(new Triangle("strongRight", 0.700, 1.000, 2.200));
+	sidewardSpeed->addTerm(new Trapezoid("strongRight", 0.700, 1.000,  1.000, 1.000));
 	sidewardSpeed->addTerm(new Trapezoid("zero", -0.800, -0.500, 0.500, 0.800));
 	engine->addOutputVariable(sidewardSpeed);
 
@@ -113,11 +113,11 @@ void FuzzyController::init() {
 	upSpeed->setDefuzzifier(new Centroid(100));
 	upSpeed->setDefaultValue(fl::nan);
 	upSpeed->setLockPreviousValue(false);
-	upSpeed->addTerm(new Triangle("strongDown", -1.200, -1.000, -0.700));
+	upSpeed->addTerm(new Trapezoid("strongDown", -1.000,-1.000, -1.000, -0.700));
 	upSpeed->addTerm(
 			new Trapezoid("mediumDown", -1.000, -0.850, -0.600, -0.250));
 	upSpeed->addTerm(new Trapezoid("mediumUp", 0.250, 0.600, 0.850, 1.000));
-	upSpeed->addTerm(new Triangle("strongUp", 0.700, 1.000, 2.200));
+	upSpeed->addTerm(new Trapezoid("strongUp", 0.700, 1.000,1.000,1.000));
 	upSpeed->addTerm(new Trapezoid("zero", -0.800, -0.500, 0.500, 0.800));
 	engine->addOutputVariable(upSpeed);
 
@@ -131,12 +131,12 @@ void FuzzyController::init() {
 	rotationSpeed->setDefuzzifier(new Centroid(100));
 	rotationSpeed->setDefaultValue(fl::nan);
 	rotationSpeed->setLockPreviousValue(false);
-	rotationSpeed->addTerm(new Triangle("strongLeft", -1.200, -1.000, -0.700));
+	rotationSpeed->addTerm(new Trapezoid("strongLeft", -1.000,-1.000, -1.000, -0.700));
 	rotationSpeed->addTerm(
 			new Trapezoid("mediumLeft", -1.000, -0.850, -0.600, -0.250));
 	rotationSpeed->addTerm(
 			new Trapezoid("mediumRight", 0.250, 0.600, 0.850, 1.000));
-	rotationSpeed->addTerm(new Triangle("strongRight", 0.700, 1.000, 2.200));
+	rotationSpeed->addTerm(new Trapezoid("strongRight", 0.700, 1.000, 1.000, 1.000));
 	rotationSpeed->addTerm(new Trapezoid("zero", -0.800, -0.500, 0.500, 0.800));
 	engine->addOutputVariable(rotationSpeed);
 
