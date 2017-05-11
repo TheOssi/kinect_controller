@@ -5,7 +5,7 @@ ROS-Node that uses the messages from openni_tracker on /tf to control a ARDrone2
 * Ubuntu 14.04
 * ROS Indigo
 * Tum Simulator Package for ROS Indigo: https://github.com/dougvk/tum_simulator
-* OpenNI: https://github.com/jstnhuang/cse481c_tutorials/wiki/How-to-run-openni_tracker
+* OpenNI + openni_tracker: https://github.com/jstnhuang/cse481c_tutorials/wiki/How-to-run-openni_tracker
 * FuzzyLite: https://github.com/fuzzylite/fuzzylite
 * If you intend using the real Drone: http://wiki.ros.org/ardrone_autonomy
 
